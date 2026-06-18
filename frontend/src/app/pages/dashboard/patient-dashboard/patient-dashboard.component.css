@@ -1,0 +1,297 @@
+.dashboard-container {
+  width: 100%;
+}
+
+.tab-content {
+  padding: 24px 0;
+}
+
+.loading-wrapper {
+  display: flex;
+  justify-content: center;
+  padding: 60px 0;
+}
+
+.action-btn-mini {
+  font-size: 11px !important;
+  line-height: 26px !important;
+  height: 28px !important;
+  padding: 0 8px !important;
+}
+
+/* Health Hub Styles */
+.health-hub-row {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 24px;
+}
+
+.greeting-card {
+  padding: 40px !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  border-radius: var(--radius-lg) !important;
+}
+
+.greeting-card h2 {
+  font-size: 28px;
+  font-weight: 800;
+  margin-bottom: 12px;
+  letter-spacing: -0.5px;
+}
+
+.greeting-card p {
+  font-size: 14px;
+  line-height: 1.5;
+  opacity: 0.9;
+  margin-bottom: 24px;
+}
+
+.book-now-btn {
+  background-color: white !important;
+  color: var(--primary) !important;
+  font-weight: 700 !important;
+  padding: 20px 24px !important;
+  border-radius: var(--radius-sm) !important;
+  box-shadow: var(--shadow-md) !important;
+  transition: var(--transition) !important;
+}
+
+.book-now-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg) !important;
+}
+
+.quick-profile-summary {
+  padding: 30px !important;
+  border-radius: var(--radius-lg) !important;
+}
+
+.quick-profile-summary h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 20px;
+}
+
+.clinical-details {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.clinical-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.clinical-item span {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.clinical-item .value {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.clinical-item .value.blood {
+  color: var(--danger);
+  background-color: rgba(239, 68, 68, 0.08);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+/* Booking wizard sub texts */
+.booking-wizard h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 4px;
+}
+
+.booking-wizard .sub-text {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 24px;
+}
+
+/* Medical Records listing */
+.records-list-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.record-card {
+  border-left: 4px solid var(--primary) !important;
+  padding: 24px !important;
+}
+
+.record-header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.rec-title h4 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 4px;
+}
+
+.rec-title p {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.record-body-details p {
+  font-size: 13px;
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+.record-attachments {
+  margin-top: 14px;
+  border-top: 1px dashed var(--border-color);
+  padding-top: 12px;
+}
+
+.record-attachments p {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.attachment-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--primary-light);
+  font-weight: 600;
+  text-decoration: none;
+  background-color: var(--primary-bg);
+  padding: 6px 12px;
+  border-radius: 4px;
+  transition: var(--transition);
+}
+
+.attachment-link:hover {
+  background-color: var(--primary);
+  color: white;
+}
+
+.attachment-link mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+/* Prescriptions list styled as medical receipts */
+.prescriptions-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+.prescription-card {
+  border: 1px solid var(--border-color);
+  border-top: 4px solid var(--accent) !important;
+  padding: 24px !important;
+}
+
+.prescription-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.prescription-header h4 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 4px;
+}
+
+.prescription-header p {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.download-pdf-btn {
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  padding: 0 12px !important;
+}
+
+.medications-table-brief {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background-color: var(--bg-app);
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.med-table-header {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1.5fr 1fr;
+  padding: 10px 16px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--primary);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.med-table-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1.5fr 1fr;
+  padding: 10px 16px;
+  font-size: 12px;
+  color: var(--text-main);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.med-table-row:last-child {
+  border-bottom: none;
+}
+
+.med-name {
+  font-weight: 600;
+}
+
+.rx-instructions-box {
+  background-color: rgba(10, 147, 150, 0.05);
+  border: 1px dashed var(--accent);
+  padding: 12px 16px;
+  border-radius: 4px;
+  font-size: 12px;
+  color: var(--text-main);
+  margin-bottom: 12px;
+}
+
+.rx-date {
+  font-size: 10px;
+  color: var(--text-muted);
+  display: block;
+}
+
+@media (max-width: 900px) {
+  .health-hub-row {
+    grid-template-columns: 1fr;
+  }
+  .greeting-card {
+    padding: 30px 20px !important;
+  }
+}

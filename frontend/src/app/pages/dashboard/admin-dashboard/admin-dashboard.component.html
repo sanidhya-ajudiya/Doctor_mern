@@ -1,0 +1,681 @@
+<div class="dashboard-container fade-in">
+  
+  <mat-tab-group class="hms-tabs" animationDuration="200ms">
+    
+    <!-- ========================================== -->
+    <!-- TAB 1: OVERVIEW & ANALYTICS -->
+    <!-- ========================================== -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon>dashboard</mat-icon>
+        <span>Overview</span>
+      </ng-template>
+      
+      <div class="tab-content">
+        @if (isLoadingStats) {
+          <div class="loading-wrapper">
+            <mat-spinner diameter="48"></mat-spinner>
+            <p>Loading analytics and stats...</p>
+          </div>
+        } @else {
+          <!-- Stats Grid -->
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon" style="background-color: var(--primary);">
+                <mat-icon>medical_services</mat-icon>
+              </div>
+              <div class="stat-info">
+                <h3>{{ stats?.totalDoctors }}</h3>
+                <p>Doctors</p>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon" style="background-color: var(--accent);">
+                <mat-icon>people</mat-icon>
+              </div>
+              <div class="stat-info">
+                <h3>{{ stats?.totalPatients }}</h3>
+                <p>Patients</p>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon" style="background-color: var(--info);">
+                <mat-icon>event_available</mat-icon>
+              </div>
+              <div class="stat-info">
+                <h3>{{ stats?.totalAppointments }}</h3>
+                <p>Appointments</p>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon" style="background-color: var(--success);">
+                <mat-icon>payments</mat-icon>
+              </div>
+              <div class="stat-info">
+                <h3>₹{{ stats?.revenue }}</h3>
+                <p>Total Revenue</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Charts & Analytics Section -->
+          <div class="analytics-row">
+            
+            <!-- SVG Chart 1: Appointments Distribution -->
+            <div class="hms-card chart-card">
+              <h3>Appointment Statuses</h3>
+              <div class="chart-container">
+                <!-- We use responsive CSS-based bars for statuses -->
+                <div class="status-bars">
+                  @for (item of charts?.apptDistribution; track item.name) {
+                    <div class="bar-row">
+                      <span class="bar-label">{{ item.name }}</span>
+                      <div class="bar-track">
+                        <div class="bar-fill" [style.width.%]="getMaxApptPercent(item.value)" 
+                             [class.bg-pending]="item.name === 'PENDING'"
+                             [class.bg-approved]="item.name === 'APPROVED'"
+                             [class.bg-completed]="item.name === 'COMPLETED'"
+                             [class.bg-cancelled]="item.name === 'CANCELLED' || item.name === 'REJECTED'">
+                        </div>
+                      </div>
+                      <span class="bar-value">{{ item.value }}</span>
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+
+            <!-- SVG Chart 2: Department Performance -->
+            <div class="hms-card chart-card">
+              <h3>Revenue by Department</h3>
+              <div class="chart-container">
+                <div class="dept-bars">
+                  @for (dept of charts?.departmentStats; track dept.department) {
+                    <div class="bar-row">
+                      <span class="bar-label">{{ dept.department }}</span>
+                      <div class="bar-track">
+                        <div class="bar-fill bg-revenue" [style.width.%]="getMaxRevenuePercent(dept.revenue)"></div>
+                      </div>
+                      <span class="bar-value">₹{{ dept.revenue }}</span>
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+            
+          </div>
+
+          <!-- Bottom Row: Recent Activities & Info -->
+          <div class="bottom-analytics-grid">
+            
+            <!-- Activity Logs -->
+            <div class="hms-card activity-card">
+              <h3>System Activity Audit Logs</h3>
+              <div class="activity-timeline">
+                @if (activityLogs.length === 0) {
+                  <p class="empty-state text-center">No recent logs recorded.</p>
+                } @else {
+                  @for (log of activityLogs; track log._id) {
+                    <div class="timeline-item">
+                      <div class="timeline-badge"></div>
+                      <div class="timeline-content">
+                        <h4>{{ log.action }}</h4>
+                        <p>{{ log.details }}</p>
+                        <span class="timeline-time">{{ log.createdAt | date:'medium' }}</span>
+                      </div>
+                    </div>
+                  }
+                }
+              </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="hms-card summary-info-card">
+              <h3>Hospital Core Metadata</h3>
+              <div class="metadata-list">
+                <div class="metadata-item">
+                  <span class="label">Total Departments</span>
+                  <span class="value">{{ stats?.totalDepartments }}</span>
+                </div>
+                <div class="metadata-item">
+                  <span class="label">Support Staff</span>
+                  <span class="value">{{ stats?.totalStaff }}</span>
+                </div>
+                <div class="metadata-item">
+                  <span class="label">Pending Requests</span>
+                  <span class="value badge badge-pending">{{ stats?.pendingAppointments }} Request(s)</span>
+                </div>
+              </div>
+              <div class="hospital-welcome-illustration">
+                <mat-icon class="welcome-icon">local_pharmacy</mat-icon>
+                <p>Lifeline General Hospital Portal is secure and encrypted.</p>
+              </div>
+            </div>
+
+          </div>
+        }
+      </div>
+  </mat-tab>
+
+  <!-- ========================================== -->
+  <!-- TAB 2: DOCTORS MANAGEMENT -->
+  <!-- ========================================== -->
+  <mat-tab>
+    <ng-template mat-tab-label>
+      <mat-icon>medical_services</mat-icon>
+      <span>Doctors</span>
+    </ng-template>
+    
+    <div class="tab-content">
+      @if (showDoctorForm) {
+        <div class="hms-card fade-in">
+          <div class="card-header">
+            <h3>{{ isEditingDoctor ? 'Edit Doctor Profile' : 'Add New Doctor' }}</h3>
+            <button mat-icon-button (click)="cancelDoctorForm()"><mat-icon>close</mat-icon></button>
+          </div>
+          
+          <form [formGroup]="doctorForm" (ngSubmit)="saveDoctor()">
+            <div class="form-grid">
+              <mat-form-field appearance="outline">
+                <mat-label>Full Name</mat-label>
+                <input matInput formControlName="name" placeholder="Dr. Jane Smith" required>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Email Address</mat-label>
+                <input matInput type="email" formControlName="email" placeholder="jane@lifeline.com" required [readonly]="isEditingDoctor">
+              </mat-form-field>
+
+              @if (!isEditingDoctor) {
+                <mat-form-field appearance="outline">
+                  <mat-label>Password</mat-label>
+                  <input matInput type="password" formControlName="password" required>
+                </mat-form-field>
+              }
+
+              <mat-form-field appearance="outline">
+                <mat-label>Phone</mat-label>
+                <input matInput formControlName="phone" placeholder="+1 555-0202">
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Gender</mat-label>
+                <mat-select formControlName="gender" required>
+                  <mat-option value="Male">Male</mat-option>
+                  <mat-option value="Female">Female</mat-option>
+                  <mat-option value="Other">Other</mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Department</mat-label>
+                <mat-select formControlName="department" required>
+                  @for (dept of departments; track dept._id) {
+                    <mat-option [value]="dept._id">{{ dept.name }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Specialization</mat-label>
+                <input matInput formControlName="specialization" placeholder="Pediatric Cardiology" required>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Experience (Years)</mat-label>
+                <input matInput type="number" formControlName="experience" min="0" required>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Consultation Fee (₹)</mat-label>
+                <input matInput type="number" formControlName="fees" min="0" required>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Qualifications</mat-label>
+                <input matInput formControlName="qualification" placeholder="MD, Ph.D" required>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Biography & Background</mat-label>
+                <textarea matInput formControlName="biography" rows="3"></textarea>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Status</mat-label>
+                <mat-select formControlName="status">
+                  <mat-option value="active">Active</mat-option>
+                  <mat-option value="inactive">Inactive</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+
+            <div class="form-submit-actions">
+              <button mat-button type="button" (click)="cancelDoctorForm()">Cancel</button>
+              <button mat-flat-button color="primary" type="submit" [disabled]="doctorForm.invalid">Save Doctor</button>
+            </div>
+          </form>
+        </div>
+      } @else {
+        <div class="action-header">
+          <h3>Active Doctor Roster</h3>
+          <button mat-flat-button color="primary" (click)="openAddDoctor()">
+            <mat-icon>add</mat-icon> Add Doctor
+          </button>
+        </div>
+
+        @if (isLoadingDoctors) {
+          <div class="loading-wrapper"><mat-spinner diameter="36"></mat-spinner></div>
+        } @else {
+          <div class="table-container">
+            <table mat-table [dataSource]="doctors" class="mat-elevation-z0">
+              <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef>Name</th>
+                <td mat-cell *matCellDef="let d">Dr. {{ d.user?.name }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="email">
+                <th mat-header-cell *matHeaderCellDef>Email</th>
+                <td mat-cell *matCellDef="let d">{{ d.user?.email }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="department">
+                <th mat-header-cell *matHeaderCellDef>Department</th>
+                <td mat-cell *matCellDef="let d">{{ d.department?.name }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="specialization">
+                <th mat-header-cell *matHeaderCellDef>Specialization</th>
+                <td mat-cell *matCellDef="let d">{{ d.specialization }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="status">
+                <th mat-header-cell *matHeaderCellDef>Status</th>
+                <td mat-cell *matCellDef="let d">
+                  <span class="badge" [class.badge-completed]="d.user?.status === 'active'" [class.badge-rejected]="d.user?.status === 'inactive'">
+                    {{ d.user?.status }}
+                  </span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef>Actions</th>
+                <td mat-cell *matCellDef="let d">
+                  <button mat-icon-button color="primary" (click)="editDoctor(d)"><mat-icon>edit</mat-icon></button>
+                  <button mat-icon-button color="warn" (click)="deleteDoctor(d._id)"><mat-icon>delete</mat-icon></button>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="doctorColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: doctorColumns;"></tr>
+            </table>
+          </div>
+        }
+      }
+    </div>
+  </mat-tab>
+
+  <!-- ========================================== -->
+  <!-- TAB 3: PATIENTS MANAGEMENT -->
+  <!-- ========================================== -->
+  <mat-tab>
+    <ng-template mat-tab-label>
+      <mat-icon>people</mat-icon>
+      <span>Patients</span>
+    </ng-template>
+    
+    <div class="tab-content">
+      @if (showPatientForm) {
+        <div class="hms-card fade-in">
+          <div class="card-header">
+            <h3>Edit Patient Record</h3>
+            <button mat-icon-button (click)="cancelPatientForm()"><mat-icon>close</mat-icon></button>
+          </div>
+          
+          <form [formGroup]="patientForm" (ngSubmit)="savePatient()">
+            <div class="form-grid">
+              <mat-form-field appearance="outline">
+                <mat-label>Full Name</mat-label>
+                <input matInput formControlName="name" required>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Phone</mat-label>
+                <input matInput formControlName="phone">
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Gender</mat-label>
+                <mat-select formControlName="gender" required>
+                  <mat-option value="Male">Male</mat-option>
+                  <mat-option value="Female">Female</mat-option>
+                  <mat-option value="Other">Other</mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Age (Years)</mat-label>
+                <input matInput type="number" formControlName="age" min="1" required>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Blood Group</mat-label>
+                <mat-select formControlName="bloodGroup" required>
+                  <mat-option value="A+">A+</mat-option>
+                  <mat-option value="A-">A-</mat-option>
+                  <mat-option value="B+">B+</mat-option>
+                  <mat-option value="B-">B-</mat-option>
+                  <mat-option value="AB+">AB+</mat-option>
+                  <mat-option value="AB-">AB-</mat-option>
+                  <mat-option value="O+">O+</mat-option>
+                  <mat-option value="O-">O-</mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Status</mat-label>
+                <mat-select formControlName="status">
+                  <mat-option value="active">Active</mat-option>
+                  <mat-option value="inactive">Inactive</mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Address</mat-label>
+                <input matInput formControlName="address">
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Medical History</mat-label>
+                <textarea matInput formControlName="medicalHistory" rows="3"></textarea>
+              </mat-form-field>
+            </div>
+
+            <div class="form-submit-actions">
+              <button mat-button type="button" (click)="cancelPatientForm()">Cancel</button>
+              <button mat-flat-button color="primary" type="submit" [disabled]="patientForm.invalid">Update Patient</button>
+            </div>
+          </form>
+        </div>
+      } @else {
+        <div class="action-header">
+          <h3>Patient Registry</h3>
+        </div>
+
+        @if (isLoadingPatients) {
+          <div class="loading-wrapper"><mat-spinner diameter="36"></mat-spinner></div>
+        } @else {
+          <div class="table-container">
+            <table mat-table [dataSource]="patients" class="mat-elevation-z0">
+              <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef>Name</th>
+                <td mat-cell *matCellDef="let p">{{ p.user?.name }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="email">
+                <th mat-header-cell *matHeaderCellDef>Email</th>
+                <td mat-cell *matCellDef="let p">{{ p.user?.email }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="age">
+                <th mat-header-cell *matHeaderCellDef>Age</th>
+                <td mat-cell *matCellDef="let p">{{ p.age }} Years</td>
+              </ng-container>
+
+              <ng-container matColumnDef="bloodGroup">
+                <th mat-header-cell *matHeaderCellDef>Blood Group</th>
+                <td mat-cell *matCellDef="let p">{{ p.bloodGroup }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="status">
+                <th mat-header-cell *matHeaderCellDef>Status</th>
+                <td mat-cell *matCellDef="let p">
+                  <span class="badge" [class.badge-completed]="p.user?.status === 'active'" [class.badge-rejected]="p.user?.status === 'inactive'">
+                    {{ p.user?.status }}
+                  </span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef>Actions</th>
+                <td mat-cell *matCellDef="let p">
+                  <button mat-icon-button color="primary" (click)="editPatient(p)"><mat-icon>edit</mat-icon></button>
+                  <button mat-icon-button color="warn" (click)="deletePatient(p._id)"><mat-icon>delete</mat-icon></button>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="patientColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: patientColumns;"></tr>
+            </table>
+          </div>
+        }
+      }
+    </div>
+  </mat-tab>
+
+  <!-- ========================================== -->
+  <!-- TAB 4: HOSPITAL STAFF -->
+  <!-- ========================================== -->
+  <mat-tab>
+    <ng-template mat-tab-label>
+      <mat-icon>badge</mat-icon>
+      <span>Staff</span>
+    </ng-template>
+    
+    <div class="tab-content">
+      @if (showStaffForm) {
+        <div class="hms-card fade-in">
+          <div class="card-header">
+            <h3>{{ isEditingStaff ? 'Edit Staff Member' : 'Register Staff Member' }}</h3>
+            <button mat-icon-button (click)="cancelStaffForm()"><mat-icon>close</mat-icon></button>
+          </div>
+          
+          <form [formGroup]="staffForm" (ngSubmit)="saveStaff()">
+            <div class="form-grid">
+              <mat-form-field appearance="outline">
+                <mat-label>Staff Full Name</mat-label>
+                <input matInput formControlName="name" required>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Email Address</mat-label>
+                <input matInput type="email" formControlName="email" required [readonly]="isEditingStaff">
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Phone Number</mat-label>
+                <input matInput formControlName="phone">
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Staff Role</mat-label>
+                <mat-select formControlName="role" required>
+                  <mat-option value="Nurse">Nurse</mat-option>
+                  <mat-option value="Receptionist">Receptionist</mat-option>
+                  <mat-option value="Pharmacist">Pharmacist</mat-option>
+                  <mat-option value="Lab Technician">Lab Technician</mat-option>
+                  <mat-option value="Other">Other</mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Department</mat-label>
+                <mat-select formControlName="department" required>
+                  @for (dept of departments; track dept._id) {
+                    <mat-option [value]="dept._id">{{ dept.name }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Status</mat-label>
+                <mat-select formControlName="status">
+                  <mat-option value="active">Active</mat-option>
+                  <mat-option value="inactive">Inactive</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+
+            <div class="form-submit-actions">
+              <button mat-button type="button" (click)="cancelStaffForm()">Cancel</button>
+              <button mat-flat-button color="primary" type="submit" [disabled]="staffForm.invalid">Save Staff</button>
+            </div>
+          </form>
+        </div>
+      } @else {
+        <div class="action-header">
+          <h3>Hospital Administrative Staff</h3>
+          <button mat-flat-button color="primary" (click)="openAddStaff()">
+            <mat-icon>add</mat-icon> Register Staff
+          </button>
+        </div>
+
+        @if (isLoadingStaff) {
+          <div class="loading-wrapper"><mat-spinner diameter="36"></mat-spinner></div>
+        } @else {
+          <div class="table-container">
+            <table mat-table [dataSource]="staffList" class="mat-elevation-z0">
+              <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef>Name</th>
+                <td mat-cell *matCellDef="let s">{{ s.name }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="email">
+                <th mat-header-cell *matHeaderCellDef>Email</th>
+                <td mat-cell *matCellDef="let s">{{ s.email }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="role">
+                <th mat-header-cell *matHeaderCellDef>Role</th>
+                <td mat-cell *matCellDef="let s"><span class="badge badge-approved">{{ s.role }}</span></td>
+              </ng-container>
+
+              <ng-container matColumnDef="department">
+                <th mat-header-cell *matHeaderCellDef>Department</th>
+                <td mat-cell *matCellDef="let s">{{ s.department?.name }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="status">
+                <th mat-header-cell *matHeaderCellDef>Status</th>
+                <td mat-cell *matCellDef="let s">
+                  <span class="badge" [class.badge-completed]="s.status === 'active'" [class.badge-rejected]="s.status === 'inactive'">
+                    {{ s.status }}
+                  </span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef>Actions</th>
+                <td mat-cell *matCellDef="let s">
+                  <button mat-icon-button color="primary" (click)="editStaff(s)"><mat-icon>edit</mat-icon></button>
+                  <button mat-icon-button color="warn" (click)="deleteStaff(s._id)"><mat-icon>delete</mat-icon></button>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="staffColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: staffColumns;"></tr>
+            </table>
+          </div>
+        }
+      }
+    </div>
+  </mat-tab>
+
+  <!-- ========================================== -->
+  <!-- TAB 5: DEPARTMENTS -->
+  <!-- ========================================== -->
+  <mat-tab>
+    <ng-template mat-tab-label>
+      <mat-icon>meeting_room</mat-icon>
+      <span>Departments</span>
+    </ng-template>
+    
+    <div class="tab-content">
+      @if (showDeptForm) {
+        <div class="hms-card fade-in">
+          <div class="card-header">
+            <h3>{{ isEditingDept ? 'Edit Department' : 'Create Department' }}</h3>
+            <button mat-icon-button (click)="cancelDeptForm()"><mat-icon>close</mat-icon></button>
+          </div>
+          
+          <form [formGroup]="deptForm" (ngSubmit)="saveDept()">
+            <div class="form-grid">
+              <mat-form-field appearance="outline">
+                <mat-label>Department Name</mat-label>
+                <input matInput formControlName="name" placeholder="E.g. Neurology" required [readonly]="isEditingDept">
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Status</mat-label>
+                <mat-select formControlName="status">
+                  <mat-option value="active">Active</mat-option>
+                  <mat-option value="inactive">Inactive</mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Description</mat-label>
+                <textarea matInput formControlName="description" rows="3"></textarea>
+              </mat-form-field>
+            </div>
+
+            <div class="form-submit-actions">
+              <button mat-button type="button" (click)="cancelDeptForm()">Cancel</button>
+              <button mat-flat-button color="primary" type="submit" [disabled]="deptForm.invalid">Save Department</button>
+            </div>
+          </form>
+        </div>
+      } @else {
+        <div class="action-header">
+          <h3>Hospital Departments</h3>
+          <button mat-flat-button color="primary" (click)="openAddDept()">
+            <mat-icon>add</mat-icon> Create Dept
+          </button>
+        </div>
+
+        @if (isLoadingDepts) {
+          <div class="loading-wrapper"><mat-spinner diameter="36"></mat-spinner></div>
+        } @else {
+          <div class="table-container">
+            <table mat-table [dataSource]="departments" class="mat-elevation-z0">
+              <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef>Department Name</th>
+                <td mat-cell *matCellDef="let d" style="font-weight: 600; color: var(--primary);">{{ d.name }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="description">
+                <th mat-header-cell *matHeaderCellDef>Description</th>
+                <td mat-cell *matCellDef="let d">{{ d.description }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="status">
+                <th mat-header-cell *matHeaderCellDef>Status</th>
+                <td mat-cell *matCellDef="let d">
+                  <span class="badge" [class.badge-completed]="d.status === 'active'" [class.badge-rejected]="d.status === 'inactive'">
+                    {{ d.status }}
+                  </span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef>Actions</th>
+                <td mat-cell *matCellDef="let d">
+                  <button mat-icon-button color="primary" (click)="editDept(d)"><mat-icon>edit</mat-icon></button>
+                  <button mat-icon-button color="warn" (click)="deleteDept(d._id)"><mat-icon>delete</mat-icon></button>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="deptColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: deptColumns;"></tr>
+            </table>
+          </div>
+        }
+      }
+    </div>
+  </mat-tab>
+  
+</mat-tab-group>
+</div>

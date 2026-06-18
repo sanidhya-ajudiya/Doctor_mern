@@ -1,0 +1,73 @@
+<div class="login-page-container fade-in">
+  <mat-card class="login-card">
+    <div class="login-header">
+      <div class="logo-wrapper">
+        <mat-icon class="logo-icon">local_hospital</mat-icon>
+      </div>
+      <h2>LIFELINE HMS</h2>
+      <p>Welcome back! Please sign in to access your dashboard.</p>
+    </div>
+
+    <mat-card-content>
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <mat-form-field appearance="outline">
+          <mat-label>Email Address</mat-label>
+          <input matInput type="email" formControlName="email" placeholder="example@domain.com" required>
+          <mat-icon matSuffix>email</mat-icon>
+          @if (loginForm.get('email')?.hasError('required')) {
+            <mat-error>Email is required</mat-error>
+          }
+          @if (loginForm.get('email')?.hasError('email')) {
+            <mat-error>Enter a valid email address</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Password</mat-label>
+          <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password" required>
+          <button type="button" mat-icon-button matSuffix (click)="hidePassword = !hidePassword" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hidePassword">
+            <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+          </button>
+          @if (loginForm.get('password')?.hasError('required')) {
+            <mat-error>Password is required</mat-error>
+          }
+        </mat-form-field>
+
+        <div class="form-actions">
+          <button mat-flat-button color="primary" type="submit" [disabled]="loginForm.invalid || isLoading" class="login-btn">
+            <span style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+              @if (isLoading) {
+                <mat-icon class="spin-animation">sync</mat-icon>
+                <span>Signing In...</span>
+              } @else {
+                <span>Sign In</span>
+              }
+            </span>
+          </button>
+        </div>
+      </form>
+
+      <div class="register-hint">
+        <p>Don't have a patient account? <a routerLink="/register">Register here</a></p>
+      </div>
+
+      <mat-divider class="or-divider"></mat-divider>
+
+      <!-- Demo logins quick-fill -->
+      <div class="demo-login-section">
+        <h4>Demo Quick-Fill Accounts</h4>
+        <div class="demo-btn-group">
+          <button mat-stroked-button type="button" (click)="quickFill('admin')" class="demo-btn admin-color">
+            <mat-icon>admin_panel_settings</mat-icon> Admin
+          </button>
+          <button mat-stroked-button type="button" (click)="quickFill('doctor')" class="demo-btn doctor-color">
+            <mat-icon>medical_services</mat-icon> Doctor
+          </button>
+          <button mat-stroked-button type="button" (click)="quickFill('patient')" class="demo-btn patient-color">
+            <mat-icon>person</mat-icon> Patient
+          </button>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

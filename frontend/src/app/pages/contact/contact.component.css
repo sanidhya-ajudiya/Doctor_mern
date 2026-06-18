@@ -1,0 +1,148 @@
+.contact-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 12px 0;
+}
+
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 28px;
+}
+
+.info-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 40px !important;
+  border-radius: var(--radius-lg) !important;
+}
+
+.info-card h2 {
+  font-size: 28px;
+  font-weight: 800;
+  margin-bottom: 8px;
+  letter-spacing: -0.5px;
+}
+
+.subtitle {
+  font-size: 14px;
+  opacity: 0.9;
+  margin-bottom: 40px;
+  line-height: 1.5;
+}
+
+.contact-methods {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  margin-bottom: 40px;
+}
+
+.method-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.method-item mat-icon {
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+  opacity: 0.9;
+  margin-top: 2px;
+}
+
+.method-item h4 {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.method-item p {
+  font-size: 13px;
+  opacity: 0.85;
+}
+
+.hours-section {
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  padding-top: 24px;
+}
+
+.hours-section h4 {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hours-section h4 mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+.hours-section p {
+  font-size: 12px;
+  opacity: 0.8;
+  margin-bottom: 4px;
+}
+
+.form-card {
+  padding: 40px !important;
+  border-radius: var(--radius-lg) !important;
+}
+
+.form-card h3 {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 6px;
+}
+
+.form-subtext {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 28px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.submit-btn {
+  padding: 24px !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  border-radius: var(--radius-sm) !important;
+  margin-top: 8px;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+}
+
+.spin-animation {
+  animation: spin 1.5s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@media (max-width: 900px) {
+  .contact-grid {
+    grid-template-columns: 1fr;
+  }
+  .info-card {
+    padding: 30px 24px !important;
+  }
+  .form-card {
+    padding: 30px 24px !important;
+  }
+}

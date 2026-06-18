@@ -1,0 +1,165 @@
+.login-page-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.login-card {
+  width: 440px;
+  padding: 32px 24px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg) !important;
+  box-shadow: var(--shadow-premium) !important;
+  transition: var(--transition);
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.logo-wrapper {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-md);
+  background: var(--primary-bg);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow-sm);
+}
+
+.logo-icon {
+  font-size: 36px;
+  width: 36px;
+  height: 36px;
+  color: var(--primary);
+}
+
+.login-header h2 {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--primary);
+  letter-spacing: -0.5px;
+  margin-bottom: 8px;
+}
+
+.login-header p {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-actions {
+  margin-top: 12px;
+}
+
+.login-btn {
+  width: 100%;
+  padding: 24px !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  border-radius: var(--radius-sm) !important;
+  transition: var(--transition) !important;
+}
+
+.spin-animation {
+  animation: spin 1.5s linear infinite;
+  margin-right: 8px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.register-hint {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.register-hint a {
+  color: var(--primary-light);
+  text-decoration: none;
+  font-weight: 600;
+  transition: var(--transition);
+}
+
+.register-hint a:hover {
+  text-decoration: underline;
+  color: var(--primary);
+}
+
+.or-divider {
+  margin: 24px 0 !important;
+}
+
+.demo-login-section {
+  text-align: center;
+}
+
+.demo-login-section h4 {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+}
+
+.demo-btn-group {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.demo-btn {
+  font-size: 11px !important;
+  padding: 0 4px !important;
+  font-weight: 600 !important;
+  border-radius: var(--radius-sm) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 4px !important;
+  background-color: var(--bg-app) !important;
+  border-color: var(--border-color) !important;
+}
+
+.demo-btn mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+.admin-color {
+  color: #3b82f6 !important;
+}
+.admin-color:hover {
+  background-color: rgba(59, 130, 246, 0.08) !important;
+}
+
+.doctor-color {
+  color: #10b981 !important;
+}
+.doctor-color:hover {
+  background-color: rgba(16, 185, 129, 0.08) !important;
+}
+
+.patient-color {
+  color: #f59e0b !important;
+}
+.patient-color:hover {
+  background-color: rgba(245, 158, 11, 0.08) !important;
+}

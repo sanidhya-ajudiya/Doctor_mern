@@ -1,0 +1,152 @@
+<!-- Non-Authenticated Shell (Login, Register, Contact) -->
+@if (!authService.isLoggedIn()) {
+  <div class="full-screen-container">
+    <router-outlet></router-outlet>
+  </div>
+}
+
+<!-- Authenticated Dashboard Shell -->
+@if (authService.isLoggedIn()) {
+  <mat-sidenav-container class="hms-container">
+    
+    <!-- Sidebar / Sidenav -->
+    <mat-sidenav #sidenav [mode]="isMobile ? 'over' : 'side'" [opened]="!isMobile" class="hms-sidenav">
+      <div class="brand-section">
+        <mat-icon class="brand-icon">local_hospital</mat-icon>
+        <span class="brand-name">Lifeline HMS</span>
+      </div>
+      
+      <div class="user-quick-profile">
+        <div class="user-avatar-placeholder">
+          {{ authService.currentUserValue?.name?.charAt(0) }}
+        </div>
+        <div class="user-meta">
+          <span class="name">{{ authService.currentUserValue?.name }}</span>
+          <span class="role badge" [class.badge-approved]="authService.currentUserValue?.role === 'admin'" 
+                               [class.badge-pending]="authService.currentUserValue?.role === 'doctor'" 
+                               [class.badge-completed]="authService.currentUserValue?.role === 'patient'">
+            {{ authService.currentUserValue?.role }}
+          </span>
+        </div>
+      </div>
+      
+      <mat-nav-list class="nav-links">
+        
+        <!-- --- Admin Navigation --- -->
+        @if (authService.currentUserValue?.role === 'admin') {
+          <a mat-list-item routerLink="/dashboard/admin" routerLinkActive="active-link" (click)="onNavItemClick()">
+            <mat-icon matListItemIcon>dashboard</mat-icon>
+            <span matListItemTitle>Admin Dashboard</span>
+          </a>
+          <!-- We trigger page section scrolls or open dialogs for administrative CRUD sub-panels in the admin view -->
+        }
+
+        <!-- --- Doctor Navigation --- -->
+        @if (authService.currentUserValue?.role === 'doctor') {
+          <a mat-list-item routerLink="/dashboard/doctor" routerLinkActive="active-link" (click)="onNavItemClick()">
+            <mat-icon matListItemIcon>dashboard</mat-icon>
+            <span matListItemTitle>Doctor Dashboard</span>
+          </a>
+        }
+
+        <!-- --- Patient Navigation --- -->
+        @if (authService.currentUserValue?.role === 'patient') {
+          <a mat-list-item routerLink="/dashboard/patient" routerLinkActive="active-link" (click)="onNavItemClick()">
+            <mat-icon matListItemIcon>dashboard</mat-icon>
+            <span matListItemTitle>Patient Dashboard</span>
+          </a>
+        }
+
+        <a mat-list-item routerLink="/contact" routerLinkActive="active-link" (click)="onNavItemClick()">
+          <mat-icon matListItemIcon>support_agent</mat-icon>
+          <span matListItemTitle>Support Desk</span>
+        </a>
+
+        <div class="nav-divider"></div>
+
+        <a mat-list-item (click)="logout()" class="logout-link">
+          <mat-icon matListItemIcon>logout</mat-icon>
+          <span matListItemTitle>Logout</span>
+        </a>
+      </mat-nav-list>
+    </mat-sidenav>
+
+    <!-- Toolbar & Content Container -->
+    <mat-sidenav-content class="hms-content-area">
+      
+      <!-- Top Header Toolbar -->
+      <mat-toolbar class="hms-toolbar">
+        <button mat-icon-button (click)="sidenav.toggle()" aria-label="Toggle Sidenav">
+          <mat-icon>menu</mat-icon>
+        </button>
+        
+        <span class="toolbar-title">{{ getToolbarTitle() }}</span>
+        
+        <span class="toolbar-spacer"></span>
+
+        <!-- Theme Toggle -->
+        <button mat-icon-button (click)="themeService.toggleTheme()" [matTooltip]="themeService.isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'">
+          <mat-icon>{{ themeService.isDark ? 'light_mode' : 'dark_mode' }}</mat-icon>
+        </button>
+
+        <!-- Notifications Bell -->
+        <button mat-icon-button [matMenuTriggerFor]="notificationMenu" aria-label="Notifications" (click)="loadNotifications()">
+          <mat-icon [matBadge]="unreadNotificationCount > 0 ? unreadNotificationCount : null" matBadgeColor="warn">
+            notifications
+          </mat-icon>
+        </button>
+
+        <mat-menu #notificationMenu="matMenu" class="notification-dropdown">
+          <div class="noti-header">
+            <h3>Notifications</h3>
+            @if (unreadNotificationCount > 0) {
+              <span class="badge badge-pending">{{ unreadNotificationCount }} New</span>
+            }
+          </div>
+          <mat-divider></mat-divider>
+          
+          <div class="noti-list">
+            @if (notifications.length === 0) {
+              <div class="no-noti">
+                <mat-icon>notifications_off</mat-icon>
+                <p>No notifications yet</p>
+              </div>
+            } @else {
+              @for (noti of notifications; track noti._id) {
+                <div class="noti-item" [class.unread]="!noti.isRead" (click)="markAsRead(noti._id)">
+                  <p class="noti-text">{{ noti.message }}</p>
+                  <span class="noti-time">{{ noti.createdAt | date:'shortTime' }}</span>
+                </div>
+              }
+            }
+          </div>
+        </mat-menu>
+
+        <!-- Profile Dropdown -->
+        <button mat-icon-button [matMenuTriggerFor]="profileMenu" aria-label="User profile">
+          <div class="toolbar-profile-avatar">
+            {{ authService.currentUserValue?.name?.charAt(0) }}
+          </div>
+        </button>
+
+        <mat-menu #profileMenu="matMenu">
+          <div class="profile-menu-header">
+            <h4>{{ authService.currentUserValue?.name }}</h4>
+            <p>{{ authService.currentUserValue?.email }}</p>
+          </div>
+          <mat-divider></mat-divider>
+          <button mat-menu-item (click)="logout()">
+            <mat-icon>logout</mat-icon>
+            <span>Logout</span>
+          </button>
+        </mat-menu>
+      </mat-toolbar>
+
+      <!-- Main Application Views -->
+      <main class="page-container fade-in">
+        <router-outlet></router-outlet>
+      </main>
+      
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+}

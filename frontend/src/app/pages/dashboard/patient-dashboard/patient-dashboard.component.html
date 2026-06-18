@@ -1,0 +1,436 @@
+<div class="dashboard-container fade-in">
+  <mat-tab-group class="hms-tabs" animationDuration="200ms" [selectedIndex]="activeTab" (selectedIndexChange)="activeTab = $event">
+    
+    <!-- ========================================== -->
+    <!-- TAB 1: HEALTH HUB OVERVIEW -->
+    <!-- ========================================== -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon>healing</mat-icon>
+        <span>Health Hub</span>
+      </ng-template>
+      
+      <div class="tab-content">
+        <!-- Dashboard Summary Grid -->
+        <div class="stats-grid">
+          <div class="stat-card clickable" (click)="activeTab = 2">
+            <div class="stat-icon" style="background-color: var(--primary);">
+              <mat-icon>event</mat-icon>
+            </div>
+            <div class="stat-info">
+              <h3>{{ appointments.length }}</h3>
+              <p>Appointments</p>
+            </div>
+          </div>
+
+          <div class="stat-card clickable" (click)="activeTab = 4">
+            <div class="stat-icon" style="background-color: var(--accent);">
+              <mat-icon>receipt</mat-icon>
+            </div>
+            <div class="stat-info">
+              <h3>{{ prescriptions.length }}</h3>
+              <p>My Prescriptions</p>
+            </div>
+          </div>
+
+          <div class="stat-card clickable" (click)="activeTab = 3">
+            <div class="stat-icon" style="background-color: var(--info);">
+              <mat-icon>assignment</mat-icon>
+            </div>
+            <div class="stat-info">
+              <h3>{{ medicalRecords.length }}</h3>
+              <p>Medical Records</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Actions & Banner -->
+        <div class="health-hub-row">
+          <div class="hms-card greeting-card gradient-bg">
+            <h2>Hello, {{ authService.currentUserValue?.name }}!</h2>
+            <p>Welcome to your personal health portal. From here you can check diagnosis histories, download prescribed medications list, or schedule consultations.</p>
+            <button mat-flat-button class="book-now-btn" (click)="activeTab = 1">
+              <mat-icon>calendar_month</mat-icon> Book a Consultation
+            </button>
+          </div>
+
+          <div class="hms-card quick-profile-summary">
+            <h3>My Clinical Info</h3>
+            <div class="clinical-details">
+              <div class="clinical-item">
+                <span>Blood Group</span>
+                <span class="value blood">{{ authService.currentProfileValue?.bloodGroup }}</span>
+              </div>
+              <div class="clinical-item">
+                <span>Age</span>
+                <span class="value">{{ authService.currentProfileValue?.age }} Years</span>
+              </div>
+              <div class="clinical-item">
+                <span>Gender</span>
+                <span class="value">{{ authService.currentUserValue?.gender }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- ========================================== -->
+    <!-- TAB 2: BOOK CONSULTATION -->
+    <!-- ========================================== -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon>calendar_month</mat-icon>
+        <span>Book Consultation</span>
+      </ng-template>
+      
+      <div class="tab-content">
+        <div class="hms-card booking-wizard fade-in">
+          <h3>Schedule an Appointment</h3>
+          <p class="sub-text">Book your consultation in three quick steps.</p>
+
+          <form [formGroup]="bookingForm" (ngSubmit)="bookAppointment()">
+            <div class="form-grid">
+              
+              <!-- Step 1: Select Department -->
+              <mat-form-field appearance="outline">
+                <mat-label>1. Select Specialty Department</mat-label>
+                <mat-select formControlName="departmentId" (selectionChange)="onDepartmentChange($event.value)" required>
+                  @for (dept of departments; track dept._id) {
+                    <mat-option [value]="dept._id">{{ dept.name }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+
+              <!-- Step 2: Select Doctor -->
+              <mat-form-field appearance="outline">
+                <mat-label>2. Select Medical Specialist</mat-label>
+                <mat-select formControlName="doctorId" (selectionChange)="onDoctorChange($event.value)" [disabled]="filteredDoctors.length === 0" required>
+                  @for (doc of filteredDoctors; track doc._id) {
+                    <mat-option [value]="doc._id">
+                      Dr. {{ doc.user?.name }} (Fee: ₹{{ doc.fees }})
+                    </mat-option>
+                  }
+                </mat-select>
+                @if (filteredDoctors.length === 0) {
+                  <mat-hint>Choose department first</mat-hint>
+                }
+              </mat-form-field>
+
+              <!-- Step 3: Select Date -->
+              <mat-form-field appearance="outline">
+                <mat-label>3. Consultation Date</mat-label>
+                <input matInput type="date" formControlName="date" [min]="minDateString" (change)="onDateChange()" required>
+              </mat-form-field>
+
+              <!-- Step 4: Select Time Slot -->
+              <mat-form-field appearance="outline">
+                <mat-label>4. Available Hour Slots</mat-label>
+                <mat-select formControlName="slot" [disabled]="availableSlots.length === 0" required>
+                  @for (s of availableSlots; track s) {
+                    <mat-option [value]="s">{{ s }}</mat-option>
+                  }
+                </mat-select>
+                @if (availableSlots.length === 0) {
+                  <mat-hint>Select doctor and date first</mat-hint>
+                }
+              </mat-form-field>
+
+              <!-- Symptoms Text Area -->
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Symptoms / Medical Reason for Visit</mat-label>
+                <textarea matInput formControlName="symptoms" rows="3" placeholder="Explain your symptoms or medical concern..." required></textarea>
+              </mat-form-field>
+
+            </div>
+
+            <div class="form-submit-actions">
+              <button mat-flat-button color="primary" type="submit" [disabled]="bookingForm.invalid || isBooking">
+                <span style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                  @if (isBooking) {
+                    <mat-icon class="spin-animation">sync</mat-icon> Booking consultation...
+                  } @else {
+                    <mat-icon>check_circle</mat-icon> Confirm Appointment
+                  }
+                </span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- ========================================== -->
+    <!-- TAB 3: APPOINTMENTS HISTORY -->
+    <!-- ========================================== -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon>history</mat-icon>
+        <span>Appointments</span>
+      </ng-template>
+      
+      <div class="tab-content">
+        @if (isLoadingAppointments) {
+          <div class="loading-wrapper"><mat-spinner diameter="36"></mat-spinner></div>
+        } @else {
+          @if (appointments.length === 0) {
+            <div class="hms-card empty-dashboard-state text-center">
+              <mat-icon class="empty-icon">event_busy</mat-icon>
+              <p>You have no appointments booked yet.</p>
+            </div>
+          } @else {
+            <div class="table-container">
+              <table mat-table [dataSource]="appointments" class="mat-elevation-z0">
+                <ng-container matColumnDef="doctor">
+                  <th mat-header-cell *matHeaderCellDef>Doctor</th>
+                  <td mat-cell *matCellDef="let appt" style="font-weight: 600;">Dr. {{ appt.doctor?.user?.name }}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="specialty">
+                  <th mat-header-cell *matHeaderCellDef>Specialty</th>
+                  <td mat-cell *matCellDef="let appt">{{ appt.department?.name }}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="date">
+                  <th mat-header-cell *matHeaderCellDef>Date</th>
+                  <td mat-cell *matCellDef="let appt">{{ appt.date | date:'longDate' }}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="slot">
+                  <th mat-header-cell *matHeaderCellDef>Time Slot</th>
+                  <td mat-cell *matCellDef="let appt"><span class="badge badge-approved">{{ appt.slot }}</span></td>
+                </ng-container>
+
+                <ng-container matColumnDef="status">
+                  <th mat-header-cell *matHeaderCellDef>Status</th>
+                  <td mat-cell *matCellDef="let appt">
+                    <span class="badge" 
+                          [class.badge-pending]="appt.status === 'pending'"
+                          [class.badge-approved]="appt.status === 'approved'"
+                          [class.badge-completed]="appt.status === 'completed'"
+                          [class.badge-rejected]="appt.status === 'rejected' || appt.status === 'cancelled'">
+                      {{ appt.status }}
+                    </span>
+                  </td>
+                </ng-container>
+
+                <ng-container matColumnDef="actions">
+                  <th mat-header-cell *matHeaderCellDef>Actions</th>
+                  <td mat-cell *matCellDef="let appt">
+                    @if (appt.status === 'pending' || appt.status === 'approved') {
+                      <button mat-stroked-button color="warn" class="action-btn-mini" (click)="cancelAppointment(appt._id)">Cancel</button>
+                    } @else {
+                      <span style="font-size: 11px; color: var(--text-muted);">No action</span>
+                    }
+                  </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="apptColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: apptColumns;"></tr>
+              </table>
+            </div>
+          }
+        }
+      </div>
+    </mat-tab>
+
+    <!-- ========================================== -->
+    <!-- TAB 4: MEDICAL FILES & RECORD HISTORY -->
+    <!-- ========================================== -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon>assignment</mat-icon>
+        <span>Medical Records</span>
+      </ng-template>
+      
+      <div class="tab-content">
+        @if (isLoadingRecords) {
+          <div class="loading-wrapper"><mat-spinner diameter="36"></mat-spinner></div>
+        } @else {
+          @if (medicalRecords.length === 0) {
+            <div class="hms-card empty-dashboard-state text-center">
+              <mat-icon class="empty-icon">assignment_late</mat-icon>
+              <p>No medical record history on file.</p>
+            </div>
+          } @else {
+            <div class="records-list-wrapper">
+              @for (rec of medicalRecords; track rec._id) {
+                <div class="hms-card record-card fade-in">
+                  <div class="record-header-bar">
+                    <div class="rec-title">
+                      <h4>{{ rec.diagnosis }}</h4>
+                      <p>Consulted with: <strong>Dr. {{ rec.doctor?.user?.name }}</strong></p>
+                    </div>
+                    <span class="badge badge-completed">{{ rec.date | date:'longDate' }}</span>
+                  </div>
+                  
+                  <div class="record-body-details">
+                    <p><strong>Treatment Plan:</strong> {{ rec.treatment || 'N/A' }}</p>
+                    @if (rec.notes) {
+                      <p><strong>Notes:</strong> {{ rec.notes }}</p>
+                    }
+                  </div>
+
+                  <!-- Attachments -->
+                  @if (rec.attachments && rec.attachments.length > 0) {
+                    <div class="record-attachments">
+                      <p><strong>Reports Attached:</strong></p>
+                      @for (file of rec.attachments; track file) {
+                        <a [href]="'http://localhost:5000' + file" target="_blank" class="attachment-link">
+                          <mat-icon>cloud_download</mat-icon> Download Report File
+                        </a>
+                      }
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          }
+        }
+      </div>
+    </mat-tab>
+
+    <!-- ========================================== -->
+    <!-- TAB 5: RX PRESCRIPTIONS -->
+    <!-- ========================================== -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon>receipt</mat-icon>
+        <span>Prescriptions</span>
+      </ng-template>
+      
+      <div class="tab-content">
+        @if (isLoadingPrescriptions) {
+          <div class="loading-wrapper"><mat-spinner diameter="36"></mat-spinner></div>
+        } @else {
+          @if (prescriptions.length === 0) {
+            <div class="hms-card empty-dashboard-state text-center">
+              <mat-icon class="empty-icon">receipt_long</mat-icon>
+              <p>No active prescriptions on file.</p>
+            </div>
+          } @else {
+            <div class="prescriptions-grid">
+              @for (rx of prescriptions; track rx._id) {
+                <div class="hms-card prescription-card fade-in">
+                  <div class="prescription-header">
+                    <div>
+                      <h4>Prescription Receipt</h4>
+                      <p>Dr. {{ rx.doctor?.user?.name }} | {{ rx.doctor?.user?.specialization || 'Lifeline Staff' }}</p>
+                    </div>
+                    <button mat-flat-button color="primary" class="download-pdf-btn" (click)="downloadPrescription(rx._id)">
+                      <mat-icon>download</mat-icon> Download PDF
+                    </button>
+                  </div>
+
+                  <mat-divider style="margin: 16px 0;"></mat-divider>
+
+                  <div class="medications-table-brief">
+                    <div class="med-table-header">
+                      <span>Drug Name</span>
+                      <span>Dosage</span>
+                      <span>Frequency</span>
+                      <span>Duration</span>
+                    </div>
+                    @for (med of rx.medications; track med.name) {
+                      <div class="med-table-row">
+                        <span class="med-name">{{ med.name }}</span>
+                        <span>{{ med.dosage }}</span>
+                        <span>{{ med.frequency }}</span>
+                        <span>{{ med.duration }}</span>
+                      </div>
+                    }
+                  </div>
+
+                  @if (rx.instructions) {
+                    <div class="rx-instructions-box">
+                      <strong>Instructions:</strong> {{ rx.instructions }}
+                    </div>
+                  }
+                  
+                  <span class="rx-date">Issued on: {{ rx.date | date:'mediumDate' }}</span>
+                </div>
+              }
+            </div>
+          }
+        }
+      </div>
+    </mat-tab>
+
+    <!-- ========================================== -->
+    <!-- TAB 6: EDIT PROFILE -->
+    <!-- ========================================== -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon>manage_accounts</mat-icon>
+        <span>Edit Profile</span>
+      </ng-template>
+      
+      <div class="tab-content">
+        <div class="hms-card">
+          <h3>Personal Details Configuration</h3>
+          <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 24px;">Ensure your contact information is up to date for booking records.</p>
+
+          <form [formGroup]="profileForm" (ngSubmit)="saveProfile()">
+            <div class="form-grid">
+              <mat-form-field appearance="outline">
+                <mat-label>Full Name</mat-label>
+                <input matInput formControlName="name" required>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Phone Number</mat-label>
+                <input matInput formControlName="phone">
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Gender</mat-label>
+                <mat-select formControlName="gender" required>
+                  <mat-option value="Male">Male</mat-option>
+                  <mat-option value="Female">Female</mat-option>
+                  <mat-option value="Other">Other</mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Age (Years)</mat-label>
+                <input matInput type="number" formControlName="age" min="1" required>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Blood Group</mat-label>
+                <mat-select formControlName="bloodGroup" required>
+                  <mat-option value="A+">A+</mat-option>
+                  <mat-option value="A-">A-</mat-option>
+                  <mat-option value="B+">B+</mat-option>
+                  <mat-option value="B-">B-</mat-option>
+                  <mat-option value="AB+">AB+</mat-option>
+                  <mat-option value="AB-">AB-</mat-option>
+                  <mat-option value="O+">O+</mat-option>
+                  <mat-option value="O-">O-</mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Residential Address</mat-label>
+                <textarea matInput formControlName="address" rows="2"></textarea>
+              </mat-form-field>
+            </div>
+
+            <div class="form-submit-actions">
+              <button mat-flat-button color="primary" type="submit" [disabled]="profileForm.invalid || isSavingProfile">
+                <span style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                  @if (isSavingProfile) {
+                    <mat-icon class="spin-animation">sync</mat-icon> Updating profile...
+                  } @else {
+                    <span>Update Profile Details</span>
+                  }
+                </span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </mat-tab>
+
+  </mat-tab-group>
+</div>

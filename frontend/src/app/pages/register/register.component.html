@@ -1,0 +1,117 @@
+<div class="register-page-container fade-in">
+  <mat-card class="register-card">
+    <div class="register-header">
+      <div class="logo-wrapper">
+        <mat-icon class="logo-icon">person_add</mat-icon>
+      </div>
+      <h2>Patient Registration</h2>
+      <p>Create your personal care portal account to book appointments and track prescriptions.</p>
+    </div>
+
+    <mat-card-content>
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Full Name</mat-label>
+            <input matInput type="text" formControlName="name" placeholder="John Doe" required>
+            <mat-icon matSuffix>person</mat-icon>
+            @if (registerForm.get('name')?.hasError('required')) {
+              <mat-error>Name is required</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Email Address</mat-label>
+            <input matInput type="email" formControlName="email" placeholder="john@gmail.com" required>
+            <mat-icon matSuffix>email</mat-icon>
+            @if (registerForm.get('email')?.hasError('required')) {
+              <mat-error>Email is required</mat-error>
+            }
+            @if (registerForm.get('email')?.hasError('email')) {
+              <mat-error>Enter a valid email address</mat-error>
+            }
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Password</mat-label>
+            <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password" required>
+            <button type="button" mat-icon-button matSuffix (click)="hidePassword = !hidePassword" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hidePassword">
+              <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+            </button>
+            @if (registerForm.get('password')?.hasError('required')) {
+              <mat-error>Password is required</mat-error>
+            }
+            @if (registerForm.get('password')?.hasError('minlength')) {
+              <mat-error>Password must be at least 6 characters</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Phone Number</mat-label>
+            <input matInput type="tel" formControlName="phone" placeholder="+1 555-0301">
+            <mat-icon matSuffix>phone</mat-icon>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row triplet">
+          <mat-form-field appearance="outline">
+            <mat-label>Gender</mat-label>
+            <mat-select formControlName="gender" required>
+              <mat-option value="Male">Male</mat-option>
+              <mat-option value="Female">Female</mat-option>
+              <mat-option value="Other">Other</mat-option>
+            </mat-select>
+            @if (registerForm.get('gender')?.hasError('required')) {
+              <mat-error>Gender is required</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Age (Years)</mat-label>
+            <input matInput type="number" formControlName="age" min="1" max="120" required>
+            @if (registerForm.get('age')?.hasError('required')) {
+              <mat-error>Age is required</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Blood Group</mat-label>
+            <mat-select formControlName="bloodGroup" required>
+              @for (bg of bloodGroups; track bg) {
+                <mat-option [value]="bg">{{ bg }}</mat-option>
+              }
+            </mat-select>
+            @if (registerForm.get('bloodGroup')?.hasError('required')) {
+              <mat-error>Blood group is required</mat-error>
+            }
+          </mat-form-field>
+        </div>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Residential Address</mat-label>
+          <textarea matInput formControlName="address" rows="2" placeholder="Street Address, City, State"></textarea>
+          <mat-icon matSuffix>home</mat-icon>
+        </mat-form-field>
+
+        <div class="form-actions">
+          <button mat-flat-button color="primary" type="submit" [disabled]="registerForm.invalid || isLoading" class="register-btn">
+            <span style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+              @if (isLoading) {
+                <mat-icon class="spin-animation">sync</mat-icon>
+                <span>Creating Account...</span>
+              } @else {
+                <span>Register Account</span>
+              }
+            </span>
+          </button>
+        </div>
+      </form>
+
+      <div class="login-hint">
+        <p>Already have an account? <a routerLink="/login">Sign in here</a></p>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

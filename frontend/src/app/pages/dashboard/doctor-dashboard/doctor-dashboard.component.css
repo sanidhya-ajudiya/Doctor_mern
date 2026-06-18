@@ -1,0 +1,313 @@
+.dashboard-container {
+  width: 100%;
+}
+
+.tab-content {
+  padding: 24px 0;
+}
+
+.loading-wrapper {
+  display: flex;
+  justify-content: center;
+  padding: 60px 0;
+}
+
+.action-header {
+  margin-bottom: 20px;
+}
+
+.action-header h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.symptoms-cell {
+  max-width: 250px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.action-btn-mini {
+  font-size: 12px !important;
+  line-height: 28px !important;
+  height: 30px !important;
+  padding: 0 10px !important;
+  margin-right: 6px !important;
+}
+
+/* Treatment workspace panel */
+.treatment-workspace {
+  border-left: 5px solid var(--accent) !important;
+  margin-bottom: 24px;
+}
+
+.patient-summary-brief {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.patient-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-sm);
+  background-color: var(--primary-bg);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+
+.patient-summary-brief h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 2px;
+}
+
+.patient-summary-brief p {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.treatment-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 24px;
+  margin-top: 16px;
+}
+
+.treatment-sub-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.treatment-sub-card h4 {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.treatment-sub-card h4 mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+/* File Upload block */
+.file-upload-block {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.file-input-label {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px;
+  border: 1px dashed var(--border-color);
+  background-color: var(--bg-app);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: var(--transition);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.file-input-label:hover {
+  background-color: var(--primary-bg);
+  border-color: var(--primary-light);
+  color: var(--primary);
+}
+
+.file-input-label mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+/* Medications Builder */
+.medications-builder {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  background-color: var(--bg-app);
+}
+
+.med-builder-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.med-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.med-input {
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 8px;
+  font-size: 12px;
+  background-color: var(--bg-card);
+  color: var(--text-main);
+  outline: none;
+}
+
+.med-input:focus {
+  border-color: var(--primary);
+}
+
+.med-name { flex: 2; min-width: 0; }
+.med-dosage { flex: 1; min-width: 0; }
+.med-freq { flex: 1.5; min-width: 0; }
+.med-dur { flex: 1; min-width: 0; }
+
+/* Assigned Patients roster grid */
+.patients-roster-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.patient-roster-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 20px !important;
+}
+
+.patient-roster-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background-color: var(--primary-bg);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 18px;
+  box-shadow: var(--shadow-sm);
+}
+
+.patient-roster-details h4 {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 2px;
+}
+
+.patient-roster-details .email {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.bio-stats {
+  display: flex;
+  gap: 12px;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+  background-color: var(--bg-app);
+  padding: 4px 8px;
+  border-radius: 4px;
+  width: fit-content;
+}
+
+.history-summary {
+  font-size: 12px;
+  color: var(--text-main);
+  line-height: 1.4;
+  border-top: 1px dashed var(--border-color);
+  padding-top: 8px;
+}
+
+/* Practice availability grids in Profile Form */
+.availability-editor {
+  margin-top: 24px;
+  border-top: 1px solid var(--border-color);
+  padding-top: 20px;
+}
+
+.availability-editor h4 {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 16px;
+}
+
+.availability-sub-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.availability-sub-grid .sub-title {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+.checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.custom-checkbox {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: 12px;
+  user-select: none;
+}
+
+.custom-checkbox input {
+  display: none;
+}
+
+.custom-checkbox span {
+  padding: 6px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 50px;
+  background-color: var(--bg-card);
+  color: var(--text-muted);
+  font-weight: 500;
+  transition: var(--transition);
+}
+
+.custom-checkbox input:checked + span {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  color: white;
+  box-shadow: var(--shadow-sm);
+}
+
+@media (max-width: 960px) {
+  .treatment-grid, .availability-sub-grid {
+    grid-template-columns: 1fr;
+  }
+}
